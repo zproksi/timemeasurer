@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "timemeasurer.h"
 
 namespace zproksi
@@ -6,17 +7,25 @@ namespace zproksi
 namespace profiler
 {
 
-TimeMeasurer::TimeMeasurer(const std::string_view name)
-    :startPoint{name, std::chrono::high_resolution_clock::now()} {
+TimeMeasurer::TimeMeasurer(const std::string_view name_, size_t amountOfExtra) {
+    if (amountOfExtra > 0) {
+        timePoints.reserve(amountOfExtra);
+    }
+    startPoint.name = name_;
+    startPoint.elapsed = std::chrono::high_resolution_clock::now();
 }
 
 TimeMeasurer::~TimeMeasurer() {
     const TIME_POINT_TYPE now = std::chrono::high_resolution_clock::now();
     for (DataVector::const_reverse_iterator rit = timePoints.crbegin(); rit != timePoints.crend(); ++rit)
     {
-        std::cout << rit->name << ": " << FormatNanoseconds(NanosecondsElapsed(rit->elapsed)) << " ns.\n";
+        std::cout << rit->name << ": " << FormatNanoseconds(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(now - rit->elapsed).count()
+            ) << " ns.\n";
     }
-    std::cout << startPoint.name << ": " << FormatNanoseconds(NanosecondsElapsed(now)) << " ns.\n";
+    std::cout << startPoint.name << ": " << FormatNanoseconds(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(now - ExecutionTimePoint()).count()
+        ) << " ns.\n";
 }
 
 const long long TimeMeasurer::NanosecondsElapsed(const TIME_POINT_TYPE at) const {
@@ -30,7 +39,6 @@ void TimeMeasurer::RegisterTimePoint(const std::string_view name) {
 TimeMeasurer::TIME_POINT_TYPE TimeMeasurer::ExecutionTimePoint() const {
     return startPoint.elapsed;
 }
-
 
 std::string TimeMeasurer::FormatNanoseconds(const long long nanoseconds) {
     std::string s;
