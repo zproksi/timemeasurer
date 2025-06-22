@@ -102,7 +102,11 @@ set "PROJECTDIR=%~dp0"
 cd /d "%PROJECTDIR%"
 if exist "buildWin%MODE%%BITNESS%" rmdir /s /q "buildWin%MODE%%BITNESS%"
 mkdir "buildWin%MODE%%BITNESS%" && cd "buildWin%MODE%%BITNESS%"
-"%CMAKECMD%" -DCMAKE_BUILD_TYPE=%MODE% .. -DBITNESS64=%BITNESS64%
+if "%BITNESS64%"=="ON" (
+    "%CMAKECMD%" -DCMAKE_BUILD_TYPE=%MODE% .. -DBITNESS64=%BITNESS64%
+) else (
+    "%CMAKECMD%" -DCMAKE_BUILD_TYPE=%MODE% .. -A Win32
+)
 "%CMAKECMD%" --build . --config %MODE%
 
 call :divisor
