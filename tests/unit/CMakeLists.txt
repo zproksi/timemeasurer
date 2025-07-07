@@ -22,13 +22,25 @@ message(STATUS "CMAKE_CXX_FLAGS:" ${CMAKE_CXX_FLAGS})
 message(STATUS "CMAKE_CXX_COMPILER_ID:" ${CMAKE_CXX_COMPILER_ID})
 set(CMAKE_EXE_LINKER_FLAGS "")
 
+
+option(BITNESS64 "Build in 64-bit mode" ON)
+if(BITNESS64)
+  # 64-bit mode
+  set(bitnesswin "")    # MSVC/Windows
+  set(bitnesslinux "")        # Linux
+else()
+  # 32-bit mode
+  set(bitnesswin "/arch:IA32")  # MSVC/Windows
+  set(bitnesslinux "-m32")    # Linux (GCC/Clang need the -m32 flag for 32-bit builds)
+endif()
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     # GCC (GNU Compiler)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG -D_DEBUG -g -D_CONSOLE -Wno-unknown-pragmas -Wall -Werror -fno-rtti -pthread")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG -D_DEBUG -g -D_CONSOLE -Wno-unknown-pragmas -Wall -Werror -fno-rtti -pthread ${bitnesslinux}")
         set(CMAKE_EXE_LINKER_FLAGS "-g")
     elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}         -DNDEBUG    -D_CONSOLE -Wno-unknown-pragmas -Wall -Werror -fno-rtti -pthread")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}         -DNDEBUG    -D_CONSOLE -Wno-unknown-pragmas -Wall -Werror -fno-rtti -pthread ${bitnesslinux}")
         set(CMAKE_EXE_LINKER_FLAGS "-O3 -flto")
     else()
         message(FATAL_ERROR "Unsupported compilation mode")
@@ -36,10 +48,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang.*")  #Clang or AppleClang or anything with Clang
     # clang (MAC Compiler)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG -D_DEBUG -g -D_CONSOLE -Wno-unknown-pragmas -Wall -Werror -Wno-unqualified-std-cast-call -fno-rtti -pthread -stdlib=libc++")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG -D_DEBUG -g -D_CONSOLE -Wno-unknown-pragmas -Wall -Werror -Wno-unqualified-std-cast-call -fno-rtti -pthread -stdlib=libc++ ${bitnesslinux}")
         set(CMAKE_EXE_LINKER_FLAGS "-g")
     elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}         -DNDEBUG    -D_CONSOLE -Wno-unknown-pragmas -Wall -Werror -Wno-unqualified-std-cast-call -fno-rtti -pthread -stdlib=libc++")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}         -DNDEBUG    -D_CONSOLE -Wno-unknown-pragmas -Wall -Werror -Wno-unqualified-std-cast-call -fno-rtti -pthread -stdlib=libc++ ${bitnesslinux}")
         set(CMAKE_EXE_LINKER_FLAGS "-O3 -flto")
     else()
         message(FATAL_ERROR "Unsupported compilation mode")
@@ -47,10 +59,10 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang.*")  #Clang or AppleClang or anyth
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # MSVC (Microsoft Visual C++)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DWIN32 /D_WINDOWS /D_CONSOLE /DDEBUG /D_DEBUG      /Zi /EHsc /W4 /WX /GR- /MDd")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DWIN32 /D_WINDOWS /D_CONSOLE /DDEBUG /D_DEBUG      /Zi /EHsc /W4 /WX /GR- /MDd ${bitnesswin}")
         set(CMAKE_EXE_LINKER_FLAGS "/DEBUG:FULL /INCREMENTAL")
     elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DWIN32 /D_WINDOWS /D_CONSOLE         /DNDEBUG /Ob1     /EHsc /W4 /WX /GR- /MD")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DWIN32 /D_WINDOWS /D_CONSOLE         /DNDEBUG /Ob1     /EHsc /W4 /WX /GR- /MD  ${bitnesswin}")
         set(CMAKE_EXE_LINKER_FLAGS "            /OPT:REF /OPT:ICF /INCREMENTAL:NO /LTCG")
     else()
         message(FATAL_ERROR "Unsupported compilation mode")
@@ -61,19 +73,16 @@ endif()
 
 message(STATUS "CMAKE_CXX_FLAGS:" ${CMAKE_CXX_FLAGS})
 
-##get google test
 include(FetchContent)
-FetchContent_Declare(googletest
-        GIT_REPOSITORY https://github.com/google/googletest
-        GIT_TAG release-1.12.1)
-FetchContent_GetProperties(googletest)
-#googletest_POPULATED
-#googletest_SOURCE_DIR
-#googletest_BUILD_DIR
-if(NOT googletest_POPULATED)
-    FetchContent_Populate(googletest)
-    add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BUILD_DIR})
-endif()
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest
+    GIT_TAG release-1.12.1
+)
+
+# Make the googletest content available
+FetchContent_MakeAvailable(googletest)
+
 
 # folder with library
 #target_include_directories(${pname} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/../../)
