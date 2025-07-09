@@ -35,7 +35,7 @@ public:
     ///    note: TimeMeasurer do not possess name of the measure - life time of the name should be longer
     /// @param name - name of the time to measure
     /// @param amountOFExtra - how many intermediate measurements supposed to be added - allocated before time serif
-    TimeMeasurer(const std::string_view name, size_t amountOfExtra = 0);
+    TimeMeasurer(const std::string_view name, size_t amountOfExtra = 0, std::ostream& out = std::cout);
 
     /// @brief all time points from later added to earlier added will be printed into std::cout
     ///   with corresponding names. (Main name provided in constructor will be printed last)
@@ -57,6 +57,7 @@ public:
 protected:
     DataVector timePoints; /// holds extra points for this measurement - can be empty
     TimePoint startPoint; /// holds start point for this class
+    std::ostream& out; // stream to output measurements
 };
 
 };// namespace profiler

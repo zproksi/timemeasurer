@@ -6,28 +6,6 @@
 
 #include "timemeasurer.h"
 
-/// @brief RAII for cout replace with ostringsstream
-class CoutReplacer final {
-    /// @brief  no copy, no move
-    CoutReplacer(const CoutReplacer&) = delete;
-    CoutReplacer(CoutReplacer&&) = delete;
-    CoutReplacer& operator =(const CoutReplacer&) = delete;
-    CoutReplacer&& operator =(CoutReplacer&&) = delete;
-
-public:
-    CoutReplacer(std::ostringstream& toreplaceWith)
-    : originalBuffer_(std::cout.rdbuf()) {
-        std::cout.rdbuf(toreplaceWith.rdbuf());
-    }
-
-    ~CoutReplacer() {
-        std::cout.rdbuf(originalBuffer_);
-    }
-protected:
-    std::streambuf* originalBuffer_;
-};
-
-
 /// <summary>
 ///  test formatting: // "title: X,XXX,XXX ns."
 ///  title & ns.
@@ -40,11 +18,8 @@ TEST(TimeMeasurer, CheckFormatting) {
 
     std::string_view title = "measure 2 milliseconds";
     {
-        // Save the original buffer of std::cout
-        CoutReplacer  replacer(sstream);
-
         using namespace zproksi::profiler;
-        TimeMeasurer mt(title);
+        TimeMeasurer mt(title, 0, sstream);
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
     }
 
@@ -84,11 +59,8 @@ TEST(TimeMeasurer, CheckSequential) {
     std::string_view title2 = "interim measure";
     std::string_view title3 = "fastest one";
     {
-        // Save the original buffer of std::cout
-        CoutReplacer  replacer(sstream);
-
         using namespace zproksi::profiler;
-        TimeMeasurer mt(title1, 2); // 2 extra titles supposed
+        TimeMeasurer mt(title1, 2, sstream); // 2 extra titles supposed
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
         mt.RegisterTimePoint(title2);
         std::this_thread::sleep_for(std::chrono::milliseconds(3));
