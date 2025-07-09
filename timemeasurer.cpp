@@ -33,22 +33,38 @@ const long long TimeMeasurer::NanosecondsElapsed(const TIME_POINT_TYPE at) const
 }
 
 void TimeMeasurer::RegisterTimePoint(const std::string_view name) {
-    timePoints.emplace_back(TimePoint{name, std::chrono::high_resolution_clock::now()});
+    timePoints.emplace_back(name, std::chrono::high_resolution_clock::now());
 }
 
 TimeMeasurer::TIME_POINT_TYPE TimeMeasurer::ExecutionTimePoint() const {
     return startPoint.elapsed;
 }
 
-std::string TimeMeasurer::FormatNanoseconds(const long long nanoseconds) {
-    std::string s;
-    s.reserve(32); // max length of long long in string representation is 21
-    s = std::to_string(nanoseconds);
-    const size_t len = s.length();
-    for (size_t i = 0; len > 3 && i < (len - 1) / 3; ++i)
-    {
-        s.insert(len - ((i + 1) * 3), 1, ','); // separate number of nanoseconds with ',' at every 3-d position
+std::string TimeMeasurer::FormatNanoseconds(const long long nanoseconds, char sep) {
+    std::string s = std::to_string(nanoseconds);
+
+    if (s.size() <= 3) {
+        // Early return when formating is not needed
+        return s;
     }
+
+    int readPos = s.size() - 1;
+
+    // Resize string to have free space at the end
+    s.resize(s.size() + (s.size() - 1) / 3);
+    int writePos = s.size() - 1;
+
+    // Shift elements to right placing a separator between 3 digits
+    for (int digitCounter = 0; readPos >= 0 && writePos >= 0;) {
+        if (digitCounter == 3) {
+            s[writePos--] = sep;
+            digitCounter = 0;
+        }
+
+        s[writePos--] = s[readPos--];
+        ++digitCounter;
+    }
+
     return s;
 }
 

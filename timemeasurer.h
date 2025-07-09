@@ -52,7 +52,7 @@ public:
 
     /// @brief returns amount of time (nanoseconds) in format "...,XXX,XXX,XXX,XXX"
     /// @note no conversion to seconds, minutes and etc.
-    static std::string FormatNanoseconds(const long long nanoseconds);
+    static std::string FormatNanoseconds(const long long nanoseconds, char sep = ',');
 
 protected:
     DataVector timePoints; /// holds extra points for this measurement - can be empty
