@@ -86,9 +86,8 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/tests/unit/build" >> "$GITHUB_OUTPUT"
 
     - name: Setup environment
-      working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: |
-        mkdir build
+        mkdir tests/unit/build
 
 
     - name: Configure CMake
