@@ -34,7 +34,7 @@ const long long TimeMeasurer::NanosecondsElapsed(const TIME_POINT_TYPE at) const
 }
 
 void TimeMeasurer::RegisterTimePoint(const std::string_view name) {
-    timePoints.emplace_back(name, std::chrono::high_resolution_clock::now());
+    timePoints.emplace_back(TimePoint{name, std::chrono::high_resolution_clock::now()});
 }
 
 TimeMeasurer::TIME_POINT_TYPE TimeMeasurer::ExecutionTimePoint() const {
