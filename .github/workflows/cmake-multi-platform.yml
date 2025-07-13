@@ -30,8 +30,7 @@ jobs:
       matrix:
         build_type: [Release, Debug]
         bitness: [32, 64]
-        os: [macos-14]
-#        os: [windows-latest, ubuntu-latest, macos-14]
+        os: [windows-latest, ubuntu-latest, macos-14]
         c_compiler: [cl, gcc, clang, clang-17]
         include:
           - bitness: 32
@@ -130,18 +129,14 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       if: matrix.os=='ubuntu-latest'
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      run: |
-        ls
-        ./testtimemeasurer
+      run: ./testtimemeasurer
 
     - name: Unit Tests on Mac
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       if: matrix.os=='macos-14'
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      run: |
-        ls
-        ./testtimemeasurer
+      run: ./testtimemeasurer
 
     - name: Unit Tests on Windows
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
