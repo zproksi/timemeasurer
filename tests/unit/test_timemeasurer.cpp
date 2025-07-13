@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 #include <chrono>
-#include <sstream>
 #include <iostream>
+#include <sstream>
+#include <thread>
 
 #include "timemeasurer.h"
 
