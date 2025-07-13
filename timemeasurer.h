@@ -25,6 +25,9 @@ public:
 protected:
     struct TimePoint
     {
+        TimePoint(std::string_view name, TIME_POINT_TYPE elapsed)
+            : name(name), elapsed(elapsed) {}
+
         std::string_view name;
         TIME_POINT_TYPE elapsed;
     };
