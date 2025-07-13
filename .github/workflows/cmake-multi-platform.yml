@@ -95,21 +95,21 @@ jobs:
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: |
-        if [ "${{ matrix.bitness }}" == "32" ]; then
+        if [ "${{ matrix.bitness }}" == "32" ]; then (
           cmake -B ${{ steps.strings.outputs.build-output-dir }} \
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
           -A Win32 \
           -S ${{ github.workspace }}/tests/unit;
-        else
+        ) else (
           cmake -B ${{ steps.strings.outputs.build-output-dir }} \
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
           -DBITNESS64=64 \
           -S ${{ github.workspace }}/tests/unit;
-        fi
+        ) fi
 
     - name: Configure CMake
       if: matrix.os!='windows-latest'
