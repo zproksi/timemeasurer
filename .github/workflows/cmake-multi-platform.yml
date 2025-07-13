@@ -83,7 +83,7 @@ jobs:
       id: strings
       shell: bash
       run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "build-output-dir=${{ github.workspace }}/tests/unit/build" >> "$GITHUB_OUTPUT"
 
     - name: Setup environment
       working-directory: ${{ steps.strings.outputs.build-output-dir }}/tests/unit
