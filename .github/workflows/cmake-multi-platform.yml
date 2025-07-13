@@ -81,6 +81,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y clang-17
         sudo apt-get install --no-install-recommends -y libc++-17-dev libc++abi-17-dev
+        sudo apt-get install -y build-essential
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
