@@ -82,6 +82,7 @@ jobs:
         sudo apt-get install -y clang-17
         sudo apt-get install --no-install-recommends -y libc++-17-dev libc++abi-17-dev
         sudo apt-get install -y build-essential
+        sudo apt-get install -y gcc-multilib
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
@@ -127,12 +128,14 @@ jobs:
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       if: matrix.os=='ubuntu-latest'
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}/testtimemeasurer/
       run: ./testtimemeasurer
 
     - name: Unit Tests on Mac
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       if: matrix.os=='macos-14'
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}/testtimemeasurer/
       run: ./testtimemeasurer
 
     - name: Unit Tests on Windows
