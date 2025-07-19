@@ -8,6 +8,8 @@ namespace zproksi
 {
 namespace profiler
 {
+/// @brief default separator for formatting output
+constexpr char default_separator = ',';
 
 /// @brief TimeMeasurer allows to measure time between creation and destruction of the class
 ///          supports interim events registration
@@ -35,7 +37,10 @@ public:
     ///    note: TimeMeasurer do not possess name of the measure - life time of the name should be longer
     /// @param name - name of the time to measure
     /// @param amountOFExtra - how many intermediate measurements supposed to be added - allocated before time serif
-    TimeMeasurer(const std::string_view name, size_t amountOfExtra = 0);
+    /// @param aseparator - character. Separator which will be used in output
+    TimeMeasurer(const std::string_view name,
+                 size_t amountOfExtra = 0,
+                 const char aseparator = default_separator);
 
     /// @brief all time points from later added to earlier added will be printed into std::cout
     ///   with corresponding names. (Main name provided in constructor will be printed last)
@@ -51,12 +56,15 @@ public:
     TIME_POINT_TYPE ExecutionTimePoint() const;
 
     /// @brief returns amount of time (nanoseconds) in format "...,XXX,XXX,XXX,XXX"
+    ///   default separator can be passed as parameter
     /// @note no conversion to seconds, minutes and etc.
-    static std::string FormatNanoseconds(const long long nanoseconds);
+    static std::string FormatNanoseconds(const long long nanoseconds,
+                                         const char separator = default_separator);
 
 protected:
     DataVector timePoints; /// holds extra points for this measurement - can be empty
     TimePoint startPoint; /// holds start point for this class
+    const char separator;
 };
 
 };// namespace profiler

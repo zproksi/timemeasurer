@@ -31,7 +31,7 @@ protected:
 /// <summary>
 ///  test formatting: // "title: X,XXX,XXX ns."
 ///  title & ns.
-///  every 4th position from the end should be ','
+///  every 4th position from the end should be ',' (default_separator)
 ///  digits on its positions
 /// </summary>
 TEST(TimeMeasurer, CheckFormatting) {
@@ -55,22 +55,65 @@ TEST(TimeMeasurer, CheckFormatting) {
     size_t posTitle = resultData.find(title); // part title
     EXPECT_NE(posTitle, std::string::npos);
 
-    size_t posNS = resultData.find(" ns."); // part " ns."
+    const size_t posNS = resultData.find(" ns."); // part " ns."
     EXPECT_NE(posNS, std::string::npos);
     EXPECT_GT(posNS, posTitle);
 
+    using zproksi::profiler::default_separator;
     // part "X,XXX,XXX"
     if (sz > 12) {
-        EXPECT_TRUE(resultData.at(posNS - 4) == ',');
-        EXPECT_TRUE(resultData.at(posNS - 8) == ',');
+        EXPECT_EQ(resultData.at(posNS - 4), default_separator);
+        EXPECT_EQ(resultData.at(posNS - 8), default_separator);
         for (size_t k : {1,2,3,5,6,7,9})
         {
             const char c = resultData.at(posNS - k);
             EXPECT_TRUE(c >= '0' && c <= '9');
         }
     }
-
 }
+
+/// <summary>
+///  test formatting: // "X,XXX,XXX,XXX" with custom separator
+///  every 4th position from the end should be given character separator
+/// </summary>
+TEST(TimeMeasurer, CustomSeparatorInFunction) {
+    const char xSeparator = '?';
+    using namespace zproksi::profiler;
+
+    std::string resultData = TimeMeasurer::FormatNanoseconds(1987123456ll, xSeparator);
+    const size_t sz = resultData.length();
+    EXPECT_GT(sz, 12); // X,XXX,XXX,XXX"
+
+    size_t posEnd = resultData.length();
+    EXPECT_EQ(resultData.at(posEnd - 4), xSeparator);
+    EXPECT_EQ(resultData.at(posEnd - 8), xSeparator);
+    EXPECT_EQ(resultData.at(posEnd - 12), xSeparator);
+}
+
+
+/// <summary>
+///  test formatting: // "title: X,XXX,XXX ns." with custom separator
+///  every 4th position from the end should be given character separator
+/// </summary>
+TEST(TimeMeasurer, CustomSeparatorInClass) {
+    const char xSeparator = '*';
+    // Create a stringstream
+    std::ostringstream sstream;
+    std::string_view title = "measure 2 milliseconds";
+    {
+        // Save the original buffer of std::cout
+        CoutReplacer  replacer(sstream);
+
+        using namespace zproksi::profiler;
+        TimeMeasurer mt(title, 0, xSeparator);
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+    }
+    std::string resultData = sstream.str();
+    const size_t posNS = resultData.find(" ns."); // part " ns."
+    EXPECT_EQ(resultData.at(posNS - 4), xSeparator);
+    EXPECT_EQ(resultData.at(posNS - 8), xSeparator);
+}
+
 
 /// <summary>
 ///  test output fo serie of measurement
