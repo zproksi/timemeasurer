@@ -7,26 +7,35 @@ namespace zproksi
 namespace profiler
 {
 
-TimeMeasurer::TimeMeasurer(const std::string_view name_, size_t amountOfExtra,
+TimeMeasurer::TimeMeasurer(const std::string_view name_, std::ostream& an_out,
+                           size_t amountOfExtra,
                            const char aseparator)
-    : separator(aseparator) {
+    : out_(an_out)
+    , separator_(aseparator) {
     if (amountOfExtra > 0) {
-        timePoints.reserve(amountOfExtra);
+        timePoints_.reserve(amountOfExtra);
     }
-    startPoint.name = name_;
-    startPoint.elapsed = std::chrono::high_resolution_clock::now();
+    startPoint_.name = name_;
+    startPoint_.elapsed = std::chrono::high_resolution_clock::now();
+}
+
+
+
+TimeMeasurer::TimeMeasurer(const std::string_view name, size_t amountOfExtra,
+                           const char aseparator)
+    : TimeMeasurer(name, std::cout, amountOfExtra, aseparator){
 }
 
 TimeMeasurer::~TimeMeasurer() {
     const TIME_POINT_TYPE now = std::chrono::high_resolution_clock::now();
-    for (DataVector::const_reverse_iterator rit = timePoints.crbegin(); rit != timePoints.crend(); ++rit) {
-        std::cout << rit->name << ": " << FormatNanoseconds(
-            std::chrono::duration_cast<std::chrono::nanoseconds>(now - rit->elapsed).count(), separator
-            ) << " ns.\n";
+    for (DataVector::const_reverse_iterator rit = timePoints_.crbegin(); rit != timePoints_.crend(); ++rit) {
+        out_ << rit->name << ": " << FormatNanoseconds(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(now - rit->elapsed).count(), separator_
+            ) << " ns." << std::endl;
     }
-    std::cout << startPoint.name << ": " << FormatNanoseconds(
-        std::chrono::duration_cast<std::chrono::nanoseconds>(now - ExecutionTimePoint()).count(), separator
-        ) << " ns.\n";
+    out_ << startPoint_.name << ": " << FormatNanoseconds(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(now - ExecutionTimePoint()).count(), separator_
+        ) << " ns." << std::endl;
 }
 
 const long long TimeMeasurer::NanosecondsElapsed(const TIME_POINT_TYPE at) const {
@@ -34,11 +43,11 @@ const long long TimeMeasurer::NanosecondsElapsed(const TIME_POINT_TYPE at) const
 }
 
 void TimeMeasurer::RegisterTimePoint(const std::string_view name) {
-    timePoints.emplace_back(TimePoint{name, std::chrono::high_resolution_clock::now()});
+    timePoints_.emplace_back(TimePoint{name, std::chrono::high_resolution_clock::now()});
 }
 
 TimeMeasurer::TIME_POINT_TYPE TimeMeasurer::ExecutionTimePoint() const {
-    return startPoint.elapsed;
+    return startPoint_.elapsed;
 }
 
 std::string TimeMeasurer::FormatNanoseconds(const long long nanoseconds, const char separator) {
