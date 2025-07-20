@@ -1,8 +1,9 @@
 #pragma once
 #include <chrono>
-#include <vector>
+#include <ostream>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace zproksi
 {
