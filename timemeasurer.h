@@ -33,8 +33,19 @@ protected:
     using DataVector = std::vector<TimePoint>;
 
 public:
-    /// @brief Full name of meaure should be passed in constructor
-    ///    note: TimeMeasurer do not possess name of the measure - life time of the name should be longer
+    /// @brief Constructs TimeMeasurer
+    ///    @note TimeMeasurer do not possess name of the measurement - remember about life time
+    /// @param name - name of the time to measure
+    /// @param an_out - output stream
+    /// @param amountOFExtra - how many intermediate measurements supposed to be added - allocated before time serif
+    /// @param aseparator - character. Separator which will be used in output
+    TimeMeasurer(const std::string_view name, std::ostream& an_out,
+                 size_t amountOfExtra = 0,
+                 const char aseparator = default_separator);
+
+    /// @brief Constructs TimeMeasurer
+    ///    @note TimeMeasurer do not possess name of the measurement - remember about life time
+    ///    @note default output stream is std::cout
     /// @param name - name of the time to measure
     /// @param amountOFExtra - how many intermediate measurements supposed to be added - allocated before time serif
     /// @param aseparator - character. Separator which will be used in output
@@ -62,9 +73,10 @@ public:
                                          const char separator = default_separator);
 
 protected:
-    DataVector timePoints; /// holds extra points for this measurement - can be empty
-    TimePoint startPoint; /// holds start point for this class
-    const char separator;
+    std::ostream& out_;      /// holds reference to the output stream
+    DataVector timePoints_;  /// holds extra points for this measurement - can be empty
+    TimePoint startPoint_;   /// holds start point for this class
+    const char separator_;   /// holds separator for time formatting
 };
 
 };// namespace profiler

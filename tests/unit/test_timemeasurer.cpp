@@ -6,7 +6,7 @@
 
 #include "timemeasurer.h"
 
-/// @brief RAII for cout replace with ostringsstream
+/// @brief RAII for replace std::cout with ostringsstream
 class CoutReplacer final {
     /// @brief  no copy, no move
     CoutReplacer(const CoutReplacer&) = delete;
@@ -27,6 +27,34 @@ protected:
     std::streambuf* originalBuffer_;
 };
 
+/// <summary>
+///  Verify that default stream is std::cout
+/// </summary>
+TEST(TimeMeasurer, VerifyStdCoutUsage) {
+    // Create a stringstream
+    std::ostringstream sstream;
+
+    std::string_view title = "measure 2 milliseconds";
+    {
+        // Save the original buffer of std::cout
+        CoutReplacer  replacer(sstream);
+
+        using namespace zproksi::profiler;
+        TimeMeasurer mt(title);
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+    }
+
+    std::string resultData = sstream.str();
+    const size_t sz = resultData.length();
+    EXPECT_GT(sz, 13); // "title: X,XXX,XXX ns."
+
+    size_t posTitle = resultData.find(title); // part title
+    EXPECT_NE(posTitle, std::string::npos);
+
+    const size_t posNS = resultData.find(" ns."); // part " ns."
+    EXPECT_NE(posNS, std::string::npos);
+    EXPECT_GT(posNS, posTitle);
+}
 
 /// <summary>
 ///  test formatting: // "title: X,XXX,XXX ns."
@@ -40,11 +68,8 @@ TEST(TimeMeasurer, CheckFormatting) {
 
     std::string_view title = "measure 2 milliseconds";
     {
-        // Save the original buffer of std::cout
-        CoutReplacer  replacer(sstream);
-
         using namespace zproksi::profiler;
-        TimeMeasurer mt(title);
+        TimeMeasurer time_measure(title, sstream);
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
     }
 
@@ -101,11 +126,8 @@ TEST(TimeMeasurer, CustomSeparatorInClass) {
     std::ostringstream sstream;
     std::string_view title = "measure 2 milliseconds";
     {
-        // Save the original buffer of std::cout
-        CoutReplacer  replacer(sstream);
-
         using namespace zproksi::profiler;
-        TimeMeasurer mt(title, 0, xSeparator);
+        TimeMeasurer time_measure(title, sstream, 0, xSeparator);
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
     }
     std::string resultData = sstream.str();
@@ -128,14 +150,12 @@ TEST(TimeMeasurer, CheckSequential) {
     std::string_view title3 = "fastest one";
     {
         // Save the original buffer of std::cout
-        CoutReplacer  replacer(sstream);
-
         using namespace zproksi::profiler;
-        TimeMeasurer mt(title1, 2); // 2 extra titles supposed
+        TimeMeasurer time_measure(title1, sstream, 2); // 2 extra titles supposed
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
-        mt.RegisterTimePoint(title2);
+        time_measure.RegisterTimePoint(title2);
         std::this_thread::sleep_for(std::chrono::milliseconds(3));
-        mt.RegisterTimePoint(title3);
+        time_measure.RegisterTimePoint(title3);
         std::this_thread::sleep_for(std::chrono::milliseconds(4));
     }
 
