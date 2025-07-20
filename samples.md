@@ -5,7 +5,7 @@
   * [Set custom output seprator](#set-custom-output-seprator)
   * [Full customization sample](#full-customization-sample)
 
- [Back to README][README.md]
+ [to README][README.md]
 
 ## Single measurement std::cout
 ```cpp
@@ -125,7 +125,7 @@ Second serif: 59#014 ns.
 Full measurement: 1#897#361 ns.
 ```
 
-[Back to README][README.md]
+[to README][README.md]
 
 [Home](#samples-of-usage-timemeasurer)
 
