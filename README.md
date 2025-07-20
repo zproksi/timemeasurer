@@ -23,7 +23,7 @@ The std::ostream, number of time serifs and the separator for printing can be cu
 ```cpp
 #include "timemeasurer.h"
 
-{ // scope where measurement need to done
+{ // scope where the measurement needs to be done
 
     using namespace zproksi::profiler;
     TimeMeasurer time_measure("test measurement");
@@ -34,7 +34,7 @@ The std::ostream, number of time serifs and the separator for printing can be cu
 } // destructor of the time_measure
 ```
 ```cpp
-// possible otput in the std::cout
+// The potential otput in the std::cout
 test measurement: 2,425,211 ns.
 ```
 
@@ -42,7 +42,7 @@ test measurement: 2,425,211 ns.
 ```cpp
 #include "timemeasurer.h"
 
-{ // scope where measurement need to done
+{ // scope where the measurement needs to be done
 
     std::ostringstream sstream;
     {
@@ -56,7 +56,7 @@ test measurement: 2,425,211 ns.
 }
 ```
 ```cpp
-// possible data in the sstream variable after call of the time_measure destructor
+// The potential data in the sstream variable after the call of the time_measure destructor
 test measurement: 1,125,144 ns.
 ```
 
@@ -85,7 +85,7 @@ test measurement: 1,125,144 ns.
 } // destructor of the time_measure
 ```
 ```cpp
-// possible otput in the std::cout
+// The potential otput in the std::cout
 Fastest Time: 1,425,211 ns.
 Shorter Time: 4,140,549 ns.
 Some logic passed: 7,245,905 ns.
@@ -96,7 +96,7 @@ Full Measurement: 9,382,101 ns.
 ```cpp
 #include "timemeasurer.h"
 
-{ // scope where measurement need to done
+{ // scope where the measurement needs to be done
 
     using namespace zproksi::profiler;
     TimeMeasurer time_measure("test measurement", 0, ':');
@@ -107,7 +107,7 @@ Full Measurement: 9,382,101 ns.
 }
 ```
 ```cpp
-// possible otput in the std::cout
+// The potential otput in the std::cout
 test measurement: 3:195:680 ns.
 ```
 
@@ -115,12 +115,11 @@ test measurement: 3:195:680 ns.
 ```cpp
 #include "timemeasurer.h"
 
-{ // scope where measurement need to done
+{ // scope where the measurement needs to be done
     std::ostringstream sstream;
     {
         using namespace zproksi::profiler;
         TimeMeasurer time_measure("Full measurement", sstream, 1, '#');
-
         //
         // a code whose execution time needs to be measured
         //
@@ -133,9 +132,9 @@ test measurement: 3:195:680 ns.
 }
 ```
 ```cpp
-// possible otput in the sstream variable
-Second serif: 2#559#014 ns.
-Full measurement: 5#197#361 ns.
+// The potential data in the sstream variable after the call to the time_measure destructor
+Second serif: 59#014 ns.
+Full measurement: 1#897#361 ns.
 ```
 
 ## Unit Tests Execution
